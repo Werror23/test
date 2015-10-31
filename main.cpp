@@ -30,8 +30,8 @@ public:
         for (int i = 0; i < row_cnt_ ; i++)
             for (int j = 0; j < col_cnt_ ; j++)
                 data_[i][j] = rand() % 10 + 1;
-       
     }
+    
     void print_matr() const
     {
         for (int i = 0; i < row_cnt_; i++)
@@ -62,6 +62,13 @@ public:
         data_[i][j] = value;
     }
     
+    matr_t & operator = ( matr_t const & a )
+    {
+        for (int i = 0; i < row_cnt_ ; i++)
+            for (int j = 0; j < col_cnt_ ; j++)
+                 set_data(i, j, a.get_data(i, j));
+    }
+
 private:
     int col_cnt_;
     int row_cnt_;
@@ -69,24 +76,28 @@ private:
     int ** data_;
 };
 
-void sum_matr( matr_t const * a, matr_t const * b, matr_t * c )
+matr_t operator + ( matr_t const & a, matr_t const & b )
 {
-    for (int i = 0; i < c->get_row_cnt() ; i++)
-        for (int j = 0; j < c->get_col_cnt() ; j++)
-            c->set_data(i, j, a->get_data(i, j) + b->get_data(i, j));
+    matr_t c(a.get_row_cnt(), a.get_col_cnt());
+    for (int i = 0; i < c.get_row_cnt() ; i++)
+        for (int j = 0; j < c.get_col_cnt() ; j++)
+            c.set_data(i, j, a.get_data(i, j) + b.get_data(i, j));
+    return c;
 }
 
-void mul_matr( matr_t const *a, matr_t const *b, matr_t *c )
+matr_t operator * ( matr_t const & a, matr_t const & b )
 {
+    matr_t c(a.get_row_cnt(), b.get_col_cnt());
     int v;
-    for (int i = 0; i < c->get_row_cnt() ; i++)
-        for (int j = 0; j < c->get_col_cnt() ; j++)
+    for (int i = 0; i < c.get_row_cnt() ; i++)
+        for (int j = 0; j < c.get_col_cnt() ; j++)
         {
             v = 0;
-            for (int m = 0; m < c->get_row_cnt(); m++)
-                v += a->get_data(i, m) * b->get_data(m, j);
-            c->set_data(i, j, v);
+            for (int m = 0; m < c.get_row_cnt(); m++)
+                v += a.get_data(i, m) * b.get_data(m, j);
+            c.set_data(i, j, v);
         }
+    return c;
 }
 
 int main(int argc, char** argv)
@@ -100,10 +111,9 @@ int main(int argc, char** argv)
     
     a.fillrand_matr();
     b.fillrand_matr();
-    sum_matr(&a, &b, &c);
-    mul_matr(&a, &b, &d);
-    
-    
+    c = a + b;
+    d = a * b;
+   
     cout << " a:\n";
     a.print_matr();
     cout << "\n b:\n";
